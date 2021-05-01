@@ -1,0 +1,70 @@
+<!-- Webpage for displaying QR Code  -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="300">
+    <title>AuthQR</title>
+</head>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="/qrcode/qrcode.min.js"></script>
+<script>
+    const socket = new WebSocket('ws://localhost:3000');
+    //const socket = new WebSocket('wss://passwdless-auth.herokuapp.com/');
+
+    // Connection opened
+    socket.addEventListener('open', function (event) {
+        socket.send(JSON.stringify({ message: 'Connected to WS Server' }))
+        console.log('Connected to WS Server')
+    });
+
+
+    // Listen for messages
+    socket.addEventListener('message', function (event) {
+
+        const server_msg = JSON.parse(event.data);
+        console.log('Message from server ' + event.data);
+        console.log('Message from server ' + JSON.parse(event.data).message);
+
+        //Generate QR code to display in web browser
+
+        if (server_msg.message == 'QR generation') {
+            console.log('QR id:   ' + server_msg.QR_Id);
+            QRCode.toCanvas(document.getElementById('canvas'), server_msg.QR_Id, function (error) {
+                if (error) console.error(error)
+                else { console.log('success!') };
+            });
+        }
+        if (server_msg.Auth == true) {
+
+            // var msg = JSON.parse(atob(server_msg.token.split('.')[1]));
+            window.location = "http://localhost:3000/home.html?user=" + server_msg.token;
+            //window.location = "https://passwdless-auth.herokuapp.com/home.html?user=" + server_msg.username;
+            // var str = " ";
+            // str += "<h1><div>Welcome!!</div></h1>";
+            // str += "<b>Name:</b>" + msg.username + "<br>";
+            // document.getElementById("start").innerHTML = " ";
+            // document.getElementById("profile").innerHTML = str;
+
+        }
+    });
+</script>
+
+
+<body>
+    <div id="start">
+        <h1>AuthQR<br>Web Login</h1>
+
+        <div>
+            <p>Scan the QR code through AuthQR app on mobile. <span></span> </p>
+        </div>
+        <canvas class="center" id="canvas"></canvas>
+    </div>
+
+    <div id="profile"></div>
+</body>
+
+</html>

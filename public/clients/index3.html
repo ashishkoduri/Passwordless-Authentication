@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Auth QR</title>
+    <link rel="shortcut icon" href="image/png/favicon.png" type="image/x-icon">
+    <!-- Bootstrap , fonts & icons  -->
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <link rel="stylesheet" href="fonts/icon-font/css/style.css">
+    <link rel="stylesheet" href="fonts/typography-font/typo.css">
+    <link rel="stylesheet" href="fonts/typography-font/lucida-grande/typo.css">
+    <link rel="stylesheet" href="fonts/fontawesome-5/css/all.css">
+    <!-- Plugin'stylesheets  -->
+    <link rel="stylesheet" href="plugins/aos/aos.min.css">
+    <link rel="stylesheet" href="plugins/fancybox/jquery.fancybox.min.css">
+    <link rel="stylesheet" href="plugins/nice-select/nice-select.min.css">
+    <link rel="stylesheet" href="plugins/slick/slick.min.css">
+    <!-- Vendor stylesheets  -->
+    <link rel="stylesheet" href="./plugins/theme-mode-switcher/switcher-panel.css">
+    <link rel="stylesheet" href="css/main.css">
+    <!-- Custom stylesheet -->
+</head>
+
+
+
+
+<!--..-->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="/qrcode/qrcode.min.js"></script>
+<script>
+    const socket = new WebSocket('ws://localhost:3000');
+    //const socket = new WebSocket('wss://passwdless-auth.herokuapp.com/');
+
+    // Connection opened
+    socket.addEventListener('open', function (event) {
+        socket.send(JSON.stringify({ message: 'Connected to WS Server' }))
+        console.log('Connected to WS Server')
+    });
+
+
+    // Listen for messages
+    socket.addEventListener('message', function (event) {
+
+        const server_msg = JSON.parse(event.data);
+        console.log('Message from server ' + event.data);
+        console.log('Message from server ' + JSON.parse(event.data).message);
+
+        //Generate QR code to display in web browser
+
+        if (server_msg.message == 'QR generation') {
+            console.log('QR id:   ' + server_msg.QR_Id);
+            QRCode.toCanvas(document.getElementById('canvas'), server_msg.QR_Id, function (error) {
+                if (error) console.error(error)
+                else { console.log('success!') };
+            });
+        }
+        if (server_msg.Auth == true) {
+
+            // var msg = JSON.parse(atob(server_msg.token.split('.')[1]));
+            window.location = "http://localhost:3000/home.html?user=" + server_msg.token;
+            //window.location = "https://passwdless-auth.herokuapp.com/home.html?user=" + server_msg.username;
+            // var str = " ";
+            // str += "<h1><div>Welcome!!</div></h1>";
+            // str += "<b>Name:</b>" + msg.username + "<br>";
+            // document.getElementById("start").innerHTML = " ";
+            // document.getElementById("profile").innerHTML = str;
+
+        }
+    });
+</script>
+
+
+
+
+
+
+<body data-theme="light" data-aos-easing="ease" data-aos-duration="400" data-aos-delay="0">
+    <div class="site-wrapper overflow-hidden">
+
+        <header
+            class="site-header site-header--menu-left sticky-bg-white light-mode-texts menu-link-hover-dodgerblue site-header--absolute site-header--sticky">
+
+        </header>
+
+        <div class="pt-21 pt-sm-24 pt-md-25 pt-lg-30 pb-lg-0 pb-md-9 pb-11 position-relative z-index-1 overflow-hidden">
+            <div class="container position-relative">
+                <div class="row position-relative justify-content-center">
+                    <!-- hero area content start -->
+                    <div class="col-xl-8 col-lg-9 col-md-12 pb-lg-21 pb-md-17 pb-sm-15 pb-10 pr-0 aos-init aos-animate"
+                        data-aos="fade-left" data-aos-duration="800" data-aos-once="true">
+                        <!-- hero area section title start -->
+                        <h1
+                            class="font-size-18 font-family-1 font-wieght-extra-bold heading-default-color letter-spacing-n3 line-height-1p228 mb-11 ">
+                            Auth QR <br> Web Login</h1>
+                        <!-- hero area section title end -->
+                        <div class="row">
+                            <!-- hero area content start -->
+                            <div class="col-lg-8 col-md-8 col-sm-10 pr-md-6 pr-sm-0">
+                                <p
+                                    class="font-size-9 letter-spacing-np4 line-height-1p714 position-relative pr-xl-14 pr-lg-0 pr-md-9 pl-lg-11 pl-9">
+                                    Scan the following QR code with the AuthQR app on your mobile to login <span
+                                        class="pos-abs-tl px-1 h-50 bg-selago-2"></span> </p>
+                            </div>
+                            <!-- hero area content end -->
+                            <!-- btn start -->
+                            <div class="col-lg-4 col-md-4 col-sm-6 pl-md-0 pl-sm-12 flex-y-center">
+                                <canvas class="center" id="canvas"></canvas>
+                            </div>
+                            <!-- btn end -->
+                        </div>
+
+
+
+                    </div>
+                    <!-- hero area content end -->
+                </div>
+                <!-- shape-1 start -->
+                <div class="pos-abs-bl mb-28 ml-xl-n18 ml-lg-n10 ml-sm-n10 translate-n50 z-index-n1">
+                    <img src="./image/l2/svg/hero-shape-1.svg" alt="" class="animate-1">
+                </div>
+                <!-- shape-1 end -->
+                <!-- shape-2 start -->
+                <div class="pos-abs-br mb-lg-5 mr-lg-n18 z-index-n1">
+                    <img src="./image/l2/png/hero-shape-2.png" alt="" class="animate-1">
+                </div>
+                <!-- shape-2 end -->
+            </div>
+        </div>
+
+        <!-- footer-header start -->
+        <div class=" position-relative site-header--menu-center scrolling reveal-header pt-6 pb-5">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12 px-0">
+                        <nav class="navbar site-navbar d-md-flex d-block text-center px-0">
+                            <!-- footer-menu start-->
+                            <div class="footer-menu">
+                                <!-- navbar-nav-wrapper start-->
+                                <div class="navbar-nav-wrapper">
+                                    <!-- main-menu start-->
+                                    <ul class="navbar-nav main-menu flex-row justify-content-center">
+                                        <li class="nav-item mx-lg-0 mx-3">
+                                            <a class="nav-link" href="#features">About</a>
+                                        </li>
+                                        <li class="nav-item mx-lg-0 mx-3">
+                                            <a class="nav-link" href="#features">Features</a>
+                                        </li>
+                                        <li class="nav-item mx-lg-0 mx-3">
+                                            <a class="nav-link" href="#features"> Works</a>
+                                        </li>
+
+                                        <li class="nav-item mx-lg-0 mx-3">
+                                            <a class="nav-link" href=" https://grayic.com/html-support/" role="button"
+                                                aria-expanded="false">Contact</a>
+                                        </li>
+                                    </ul>
+                                    <!-- main-menu end-->
+                                </div>
+                                <!-- navbar-nav-wrapper end-->
+                            </div>
+                            <!-- footer-menu end-->
+                            <div class="ml-auto pr-2 ml-lg-12 ml-md-0">
+                                <!-- widget social icon start -->
+                                <div class="social-icons">
+                                    <!-- widget social icon list start -->
+                                    <ul class="pl-0 list-unstyled mb-lg-6 mb-0">
+                                        <li class="d-inline-block px-3 ml-3"><a href="#"
+                                                class="hover-color-primary text-mineshaft"><i
+                                                    class="fab fa-facebook-f font-size-3 pt-2"></i></a></li>
+                                        <li class="d-inline-block px-3 ml-3"><a href="#"
+                                                class="hover-color-primary text-mineshaft"><i
+                                                    class="fab fa-twitter font-size-3 pt-2"></i></a></li>
+                                        <li class="d-inline-block px-3 ml-3"><a href="#"
+                                                class="hover-color-primary text-mineshaft"><i
+                                                    class="fab fa-linkedin-in font-size-3 pt-2"></i></a></li>
+                                    </ul>
+                                    <!-- widget social icon list end -->
+                                </div>
+                                <!-- widget social icon end -->
+                            </div>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- cta section -->
+
+    </div>
+    <!-- Vendor Scripts -->
+    <script src="js/vendor.min.js"></script>
+    <!-- Plugin's Scripts -->
+    <script src="plugins/fancybox/jquery.fancybox.min.js"></script>
+    <script src="plugins/nice-select/jquery.nice-select.min.js"></script>
+    <script src="plugins/aos/aos.min.js"></script>
+    <script src="plugins/slick/slick.min.js"></script>
+    <script src="./plugins/counter-up/jquery.waypoints.js"></script>
+    <script src="./plugins/counter-up/jquery.counterup.js"></script>
+    <script src="plugins/theme-mode-switcher/gr-theme-mode-switcher.js"></script>
+    <!-- Activation Script -->
+    <script src="js/custom.js"></script>
+
+
+</body>
+
+</html>

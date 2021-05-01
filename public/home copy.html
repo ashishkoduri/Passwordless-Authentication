@@ -1,0 +1,67 @@
+<h1>
+    <div>Welcome!!</div>
+</h1>
+<h1 id='user'> </h1>
+<input type="button" value="Log out" onclick="logout()">
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+    window.onload = function () {
+
+        var parameters = location.search.substring(1).split("&");
+        var temp = parameters[0].split("=");
+        var token = unescape(temp[1]);
+        data = JSON.parse(atob(token.split('.')[1]));
+        document.getElementById("user").innerHTML = data.username;
+
+    };
+</script>
+<script>
+    setInterval(function () {
+        var oReq = new XMLHttpRequest();
+
+        oReq.open("POST", "http://localhost:3000/logout/check");
+        oReq.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        oReq.responseType = 'json';
+        oReq.send("username=" + data.username);
+        // oReq.send({ 'username': data.username });
+        oReq.onload = function () {
+            let body = oReq.response;
+            console.log(body);
+            console.log("##");
+            console.log(body.msg);
+            if (body.msg == "Logged out") {
+                console.log('inside if');
+                window.location = "http://localhost:3000/clients/index1.html";
+            }
+            else {
+                console.log('inside else');
+
+            }
+        }
+
+
+        //window.location = "http://localhost:3000/clients/index1.html";
+    }, 1000);
+</script>
+
+<script>
+
+    function logout() {
+        var data;
+        var parameters = location.search.substring(1).split("&");
+        var temp = parameters[0].split("=");
+        var token = unescape(temp[1]);
+        data = JSON.parse(atob(token.split('.')[1]));
+        console.log('name on browser');
+        console.log(data.username);
+        var oReq = new XMLHttpRequest();
+
+        oReq.open("POST", "http://localhost:3000/logout");
+        oReq.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        oReq.send("username=" + data.username);
+        // oReq.send({ 'username': data.username });
+        window.location = "http://localhost:3000/clients/index1.html";
+    }
+
+</script>
